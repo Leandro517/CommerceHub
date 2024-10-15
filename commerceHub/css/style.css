@@ -1,0 +1,125 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Estilo do cabeçalho */
+header {
+    background: linear-gradient(to bottom, #111, #333);
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo do menu lateral */
+nav {
+    width: 200px;
+    background-color: #222;
+    height: calc(100vh - 70px);
+    position: fixed;
+    top: 70px;
+    left: 0;
+    overflow-y: auto;
+    padding-top: 20px;
+    border-right: 2px solid #444;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+nav ul {
+    list-style: none;
+    padding: 10px 0;
+}
+
+nav ul li {
+    margin: 15px 0;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    padding: 10px;
+}
+
+nav ul li a:hover {
+    background-color: #555;
+    color: #ffcc00;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilo do conteúdo principal */
+main {
+    margin-left: 220px;
+    margin-top: 70px;
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap; /* Permite que os cards quebrem para a linha seguinte */
+}
+
+/* Estilos principais para os cards */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: calc(33.33% - 20px); /* Largura para garantir 3 cards por linha */
+    max-width: calc(33.33% - 20px); /* Impede que os cards ultrapassem essa largura */
+    text-align: center;
+    margin: 10px; /* Espaçamento entre os cards */
+}
+
+.card h2 {
+    margin-bottom: 15px;
+}
+
+.card p {
+    margin-bottom: 20px;
+}
+
+.card button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
+}
+
+.card button:hover {
+    background-color: #555;
+    color: #FFD700;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Rodapé */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    background: linear-gradient(to top, #111, #333);
+    color: #fff;
+    position: relative;
+    margin-top: auto;
+    width: 100%;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+}
