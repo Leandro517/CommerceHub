@@ -5,6 +5,114 @@
     box-sizing: border-box;
 }
 
+/* Container principal para centrar a tela de login */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #444;
+}
+
+/* Caixa de login */
+.login-box {
+    background-color: #333;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    text-align: center;
+    color: #fff;
+}
+
+/* Título da tela de login */
+.login-box h2 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    color: #FFD700;
+}
+
+/* Estilo dos grupos de entrada (labels e inputs) */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 14px;
+    color: #fff;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+    font-size: 16px;
+}
+
+/* Estilo do botão de login */
+.login-box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ffcc00;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.login-box button:hover {
+    background-color: #FFD700;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilo do link de cadastro */
+.signup-link {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.signup-link a {
+    color: #FFD700;
+    text-decoration: none;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Estilo da mensagem de erro sobreposta */
+.error-message {
+    background-color: rgba(255, 0, 0, 0.85);
+    color: #fff;
+    padding: 20px;
+    border-left: 5px solid #d8000c;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 8px;
+    font-size: 18px;
+    text-align: center;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 80%;
+    max-width: 500px;
+}
+
+.error-message strong {
+    font-weight: bold;
+}
+
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -51,7 +159,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #fff;
+    color: #ffffff;
     text-decoration: none;
     font-weight: bold;
     display: block;
@@ -64,6 +172,13 @@ nav ul li a:hover {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Botão logout */
+.logout {
+    position: absolute;
+    bottom: 60px;
+    width: 100%;
+}
+
 /* Estilo do conteúdo principal */
 main {
     margin-left: 220px;
@@ -71,7 +186,7 @@ main {
     padding: 20px;
     flex-grow: 1;
     display: flex;
-    flex-wrap: wrap; /* Permite que os cards quebrem para a linha seguinte */
+    flex-wrap: wrap;
 }
 
 /* Estilos principais para os cards */
@@ -80,10 +195,10 @@ main {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    width: calc(33.33% - 20px); /* Largura para garantir 3 cards por linha */
-    max-width: calc(33.33% - 20px); /* Impede que os cards ultrapassem essa largura */
+    width: calc(33.33% - 20px);
+    max-width: calc(33.33% - 20px);
     text-align: center;
-    margin: 10px; /* Espaçamento entre os cards */
+    margin: 10px;
 }
 
 .card h2 {

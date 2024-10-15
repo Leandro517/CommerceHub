@@ -18,11 +18,27 @@
             <li><a href="../cadastros/cadastros.php">Cadastros</a></li>
             <li><a href="../relatorios/relatorios.php">Relatórios</a></li>
             <li><a href="movimentacoes.php">Movimentações</a></li>
+            </ul>
+        <!-- Botão Logout -->
+        <ul style="position: absolute; bottom: 20px; width: 100%;">
+            <li class="logout"><a href="../logout.php">Logout</a></li>
         </ul>
     </nav>
 
     <main>
-        
+         <!-- Movimentação de Vendas-->
+         <section class="card">
+            <h2>Vendas</h2>
+            <p>Movimentação de Vendas.</p>
+            <a href="cadastros/cadastro_produtos.php"><button>Exibir Vendas</button></a>
+        </section>
+
+        <!-- Movimentação de Compras-->
+        <section class="card">
+            <h2>Compras</h2>
+            <p>Movimentação de Compras.</p>
+            <a href="cadastros/cadastro_produtos.php"><button>Exibir Compras</button></a>
+        </section>
     </main>
 
     <footer>
