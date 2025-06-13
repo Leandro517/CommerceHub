@@ -30,18 +30,19 @@
          <section class="card">
             <h2>Vendas</h2>
             <p>Movimentação de Vendas.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Vendas</button></a>
+            <a href="movimentacao_vendas.php"><button>Exibir Vendas</button></a>
         </section>
 
         <!-- Movimentação de Compras-->
         <section class="card">
             <h2>Compras</h2>
             <p>Movimentação de Compras.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Compras</button></a>
+            <a href="movimentacao_compras.php"><button>Exibir Compras</button></a>
         </section>
     </main>
 
-    <footer>
+   <!-- Rodapé -->
+   <footer>
         <p>&copy; 2024 CommerceHub - Todos os direitos reservados.</p>
     </footer>
 </body>

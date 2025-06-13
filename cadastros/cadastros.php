@@ -28,42 +28,43 @@
          <!-- Cadastro de Produtos-->
         <section class="card">
             <h2>Cadastrar Produtos</h2>
-            <p>Cadastre seus produtos.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Cadastrar Categoria</button></a>
+            <p>Cadastre seus produtos</p>
+            <a href="cadastro_produtos.php"><button>Cadastrar Produto</button></a>
         </section>
 
         <!-- Cadastro de Categoria-->
          <section class="card">
             <h2>Cadastrar Categoria</h2>
-            <p>Cadastre suas categorias dos seus produtos.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Cadastrar Produto</button></a>
+            <p>Cadastre suas categorias</p>
+            <a href="cadastro_categorias.php"><button>Cadastrar Categoria</button></a>
         </section>
 
-              <!-- Cadastro de Funcionarios-->
-              <section class="card">
+        <!-- Cadastro de Funcionarios-->
+        <section class="card">
             <h2>Cadastrar Funcionario</h2>
-            <p>Cadastre seus Funcionarios..</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Cadastrar Funcionario</button></a>
+            <p>Cadastre seus Funcionarios</p>
+            <a href="cadastro_funcionarios.php"><button>Cadastrar Funcionario</button></a>
         </section>
 
-              <!-- Cadastro de Fornecedores-->
-              <section class="card">
+        <!-- Cadastro de Fornecedores-->
+        <section class="card">
             <h2>Cadastrar Fornecedores</h2>
-            <p>Cadastre os fornecedores de sua empresa.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Cadastrar Fornecedor</button></a>
+            <p>Cadastre os fornecedores de sua empresa</p>
+            <a href="cadastro_fornecedores.php"><button>Cadastrar Fornecedor</button></a>
         </section>
 
-              <!-- Cadastro de Produtos-->
-              <section class="card">
+        <!-- Cadastro de Produtos-->
+        <section class="card">
             <h2>Cadastrar Cliente</h2>
-            <p>Cadastre seus clientes.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Cadastrar Cliente</button></a>
+            <p>Cadastre seus clientes</p>
+            <a href="cadastro_clientes.php"><button>Cadastrar Cliente</button></a>
         </section>
 
     </main>
 
-    <footer>
-        <p>© 2024 Seu Sistema. Todos os direitos reservados.</p>
+   <!-- Rodapé -->
+   <footer>
+        <p>&copy; 2024 CommerceHub - Todos os direitos reservados.</p>
     </footer>
 </body>
 </html>

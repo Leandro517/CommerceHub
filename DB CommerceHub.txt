@@ -1,0 +1,118 @@
+CREATE DATABASE IF NOT EXISTS commercehub;
+USE commercehub;
+
+-- Tabela categoria
+CREATE TABLE categoria (
+    ID_Categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255) NULL
+);
+
+-- Tabela cliente
+CREATE TABLE cliente (
+    ID_Cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NULL,
+    telefone VARCHAR(20) NULL,
+    endereco VARCHAR(255) NULL
+);
+
+-- Tabela fornecedor
+CREATE TABLE fornecedor (
+    ID_Fornecedor INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    telefone VARCHAR(20) NULL,
+    endereco VARCHAR(255) NULL,
+    condicoes_pagamento VARCHAR(255) NULL
+);
+
+-- Tabela funcionario
+CREATE TABLE funcionario (
+    ID_Funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    telefone VARCHAR(20) NULL,
+    cargo VARCHAR(255) NULL,
+    departamento VARCHAR(255) NULL
+);
+
+-- Tabela produtos
+CREATE TABLE produtos (
+    ID_Produto INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255) NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    quantidade INT NOT NULL,
+    ID_Categoria INT NULL,
+    FOREIGN KEY (ID_Categoria) REFERENCES categoria(ID_Categoria)
+);
+
+-- Tabela compra
+CREATE TABLE compra (
+    ID_Compra INT AUTO_INCREMENT PRIMARY KEY,
+    data_compra DATE NOT NULL,
+    valor_total DECIMAL(10,2) NULL,
+    ID_Fornecedor INT NULL,
+    ID_Funcionario INT NULL,
+    FOREIGN KEY (ID_Fornecedor) REFERENCES fornecedor(ID_Fornecedor),
+    FOREIGN KEY (ID_Funcionario) REFERENCES funcionario(ID_Funcionario)
+);
+
+-- Tabela compra_produto
+CREATE TABLE compra_produto (
+    ID_Compra INT NOT NULL,
+    ID_Produto INT NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    quantidade INT NOT NULL,
+    PRIMARY KEY (ID_Compra, ID_Produto),
+    FOREIGN KEY (ID_Compra) REFERENCES compra(ID_Compra),
+    FOREIGN KEY (ID_Produto) REFERENCES produtos(ID_Produto)
+);
+
+-- Tabela venda
+CREATE TABLE venda (
+    ID_Venda INT AUTO_INCREMENT PRIMARY KEY,
+    data_venda DATE NOT NULL,
+    valor_total DECIMAL(10,2) NULL,
+    ID_Cliente INT NULL,
+    ID_Funcionario INT NULL,
+    FOREIGN KEY (ID_Cliente) REFERENCES cliente(ID_Cliente),
+    FOREIGN KEY (ID_Funcionario) REFERENCES funcionario(ID_Funcionario)
+);
+
+-- Tabela venda_produto
+CREATE TABLE venda_produto (
+    ID_Venda INT NOT NULL,
+    ID_Produto INT NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    quantidade INT NOT NULL,
+    PRIMARY KEY (ID_Venda, ID_Produto),
+    FOREIGN KEY (ID_Venda) REFERENCES venda(ID_Venda),
+    FOREIGN KEY (ID_Produto) REFERENCES produtos(ID_Produto)
+);
+
+-- Tabela estoque
+CREATE TABLE estoque (
+    ID_Estoque INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Produto INT NOT NULL,
+    tipo_movimento ENUM('entrada', 'saida') NOT NULL,  -- 'entrada' para compras, 'saida' para vendas
+    quantidade INT NOT NULL,
+    data_movimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ID_Produto) REFERENCES produtos(ID_Produto)
+);
+
+--------Adicionado---------
+
+CREATE TABLE usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  senha_hash VARCHAR(255) NOT NULL,
+  tipo ENUM('admin', 'funcionario') NOT NULL DEFAULT 'funcionario',
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO usuarios (nome, email, senha_hash, tipo) VALUES (
+  'Administrador',
+  'admin@commercehub.com',
+  '$2y$10$yEUPUoYHmgK6/OEc8.qoLuElkCjUvAKvFkQfqFTyoq5VR.95BSyz2',
+  'admin'
+);

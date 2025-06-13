@@ -1,8 +1,18 @@
-/* Reset básico */
-* {
+ /* Reset básico */
+ * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Container principal para centrar a tela de login */
@@ -11,25 +21,51 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #444;
+    background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
 }
 
 /* Caixa de login */
 .login-box {
-    background-color: #333;
+    background-color: rgba(58, 58, 58, 0.9);
     padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     width: 350px;
     text-align: center;
-    color: #fff;
+    position: relative;
+    transition: transform 0.3s;
+}
+
+/* Animação de tremor */
+.shake {
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
 }
 
 /* Título da tela de login */
 .login-box h2 {
-    margin-bottom: 30px;
-    font-size: 24px;
-    color: #FFD700;
+    margin-bottom: 10px;
+    font-size: 28px;
+    color: #ffcc00;
+    text-transform: uppercase;
+    position: relative;
+}
+
+/* Linha decorativa abaixo do título */
+.login-box h2::after {
+    content: '';
+    display: block;
+    width: 250px;
+    height: 2px;
+    background-color: #ffcc00;
+    margin: 0 auto 0;
 }
 
 /* Estilo dos grupos de entrada (labels e inputs) */
@@ -40,38 +76,43 @@
 
 .input-group label {
     font-size: 14px;
-    color: #fff;
+    color: #e0e0e0;
     display: block;
     margin-bottom: 5px;
 }
 
 .input-group input {
     width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #444;
-    color: #fff;
+    padding: 12px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    background-color: #4a4a4a;
+    color: #ffffff;
     font-size: 16px;
+    transition: border 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #ffcc00;
+    outline: none;
 }
 
 /* Estilo do botão de login */
 .login-box button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background-color: #ffcc00;
     color: #333;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .login-box button:hover {
-    background-color: #FFD700;
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background-color: #e0b800;
+    transform: translateY(-2px);
 }
 
 /* Estilo do link de cadastro */
@@ -81,7 +122,7 @@
 }
 
 .signup-link a {
-    color: #FFD700;
+    color: #ffcc00;
     text-decoration: none;
 }
 
@@ -91,62 +132,122 @@
 
 /* Estilo da mensagem de erro sobreposta */
 .error-message {
-    background-color: rgba(255, 0, 0, 0.85);
+    background-color: rgba(77, 77, 77, 0.95);
     color: #fff;
-    padding: 20px;
-    border-left: 5px solid #d8000c;
-    position: fixed;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    padding: 15px;
     border-radius: 8px;
-    font-size: 18px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
     text-align: center;
     z-index: 9999;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    width: 80%;
-    max-width: 500px;
-}
-
-.error-message strong {
-    font-weight: bold;
-}
-
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    width: 320px;
+    box-shadow: 0 5px 15px #3a3a3a;
+    border-left: 6px solid red;
+    animation: slideBounceFade 5s ease-in-out;
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    align-items: center;
+    gap: 10px;
 }
+
+/* Triângulo com ponto de interrogação */
+.error-icon {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid red;
+    position: relative;
+}
+
+.error-icon::after {
+    content: '!';
+    position: absolute;
+    top: -15px;
+    left: 3px;
+    color: red;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Animação do ícone */
+.error-icon {
+    animation: iconBounce 5s ease-in-out;
+}
+
+@keyframes iconBounce {
+    0% {
+        transform: scale(1) translateY(0);
+    }
+    20% {
+        transform: scale(1.2) translateY(-5px);
+    }
+    40% {
+        transform: scale(1) translateY(0);
+    }
+    60% {
+        transform: scale(1.2) translateY(-3px);
+    }
+    80% {
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideBounceFade {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    20% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+    30% {
+        transform: translateX(-50%) translateY(0);
+    }
+    90% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+}
+
 
 /* Estilo do cabeçalho */
 header {
-    background: linear-gradient(to bottom, #111, #333);
-    color: #fff;
-    padding: 20px 0;
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    padding: 15px 0;
     text-align: center;
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Estilo do menu lateral */
 nav {
     width: 200px;
-    background-color: #222;
+    background-color: #3a3a3a;
     height: calc(100vh - 70px);
     position: fixed;
     top: 70px;
     left: 0;
     overflow-y: auto;
-    padding-top: 20px;
-    border-right: 2px solid #444;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    border-right: 1px solid #555;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
 }
 
 nav ul {
@@ -159,25 +260,23 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #ffffff;
+    color: #e0e0e0;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: normal;
     display: block;
     padding: 10px;
+    border-radius: 4px;
 }
 
 nav ul li a:hover {
     background-color: #555;
-    color: #ffcc00;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Botão logout */
+/* Botão Logout */
 .logout {
-    position: absolute;
-    bottom: 60px;
-    width: 100%;
+    transform: translateY(-15px); 
 }
+
 
 /* Estilo do conteúdo principal */
 main {
@@ -189,52 +288,416 @@ main {
     flex-wrap: wrap;
 }
 
+/* Estilos principais para a tabela */
+.container {
+    margin-left: 220px;
+    margin-top: 70px;
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-container {
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    padding-bottom: 60px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #555;
+}
+
+th {
+    background-color: #4a4a4a;
+    color: #ffcc00;
+}
+
+td {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+table {
+    margin-bottom: 80px;
+}
+
 /* Estilos principais para os cards */
 .card {
-    background-color: #fff;
+    background-color: #3a3a3a;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     padding: 20px;
     width: calc(33.33% - 20px);
-    max-width: calc(33.33% - 20px);
-    text-align: center;
     margin: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .card h2 {
     margin-bottom: 15px;
+    color: #ffcc00;
 }
 
 .card p {
     margin-bottom: 20px;
+    color: #e0e0e0;
 }
 
+/* Estilos para os botões dos cards */
 .card button {
     padding: 10px 20px;
-    background-color: #333;
+    background-color: #ffcc00;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.card button:hover {
+    background-color: #e0b800;
+    transform: translateY(-2px);
+}
+
+.add-button {
+    padding: 10px 20px;
+    background-color: #28a745;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin: 10px 0;
+    min-width: 200px;
+    white-space: nowrap;
 }
 
-.card button:hover {
-    background-color: #555;
-    color: #FFD700;
+.add-button:hover,
+.add-button:hover {
+    background-color: #218838;
+}
+
+/* Estilo para o botão de gerar PDF */
+.button-pdf {
+    background-color: #9b59b6;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.button-pdf i {
+    margin-right: 10px;
+}
+
+.button-pdf:hover {
+    background-color: #8e44ad;
+    transform: scale(1.05);/
+}
+
+.button-pdf:active {
+    background-color: #732d91;
+    transform: scale(0.98);
+}
+
+/* Estilo para o botão motion */
+.motion-button {
+    background-color: #f39c12;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.motion-button i {
+    margin-right: 8px;
+}
+
+.motion-button:hover {
+    background-color: #e67e22;
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Rodapé */
+.motion-button:active {
+    background-color: #d35400; 
+    transform: scale(0.98);
+}
+
+/* Estilos para os botões de editar e excluir */
+button.edit {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin: 10px;
+}
+
+button.edit:hover {
+    background-color: #0056b3;
+}
+
+button.delete {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin: 10px;
+}
+
+button.delete:hover {
+    background-color: #c82333;
+}
+
+/* Estilo da barra de pesquisa */
+.search-section {
+    margin: 20px 0; 
+}
+
+.search-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.search-bar select {
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #4a4a4a;
+    color: #ffffff;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.search-bar input {
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #4a4a4a;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.search-bar button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo do rodapé */
 footer {
     text-align: center;
     padding: 20px 0;
-    background: linear-gradient(to top, #111, #333);
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    position: fixed; /* Fixo na parte inferior */
+    bottom: 0; /* Na parte inferior da janela */
+    left: 0; /* Alinhado à esquerda */
+    width: 100%; /* Largura total */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Estilo da barra de pesquisa */
+.search-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #4a4a4a;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    background-color: #007bff;
     color: #fff;
-    position: relative;
-    margin-top: auto;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.search-bar button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo do modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
     width: 100%;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Conteúdo do modal */
+.modal-content {
+    background-color: #3a3a3a;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    min-height: 300px;
+}
+
+/* Cabeçalho do modal */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Título do modal */
+.modal-header h2 {
+    color: #ffcc00;
+}
+
+/* Botão de fechar */
+.modal-header .close {
+    font-size: 24px;
+    color: #ffcc00;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal-header .close:hover {
+    color: #e0b800;
+}
+
+/* Corpo do modal */
+.modal-body {
+    margin-top: 20px;
+}
+
+/* Estilo dos grupos de entradas */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #4a4a4a;
+    color: #ffffff;
+}
+
+/* Estilo do botão de salvar */
+.modal-footer {
+    margin-top: 20px;
+    text-align: right;
+    padding-top: 15px;
+    border-top: 1px solid #555;
+}
+
+
+.btn-save {
+    padding: 10px 20px;
+    background-color: #ffcc00;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-top: 0; 
+    position: relative;
+    top: 0;
+}
+
+.btn-save:hover {
+    background-color: #e0b800;
+    transform: translateY(-2px);
+}
+
+/* Estilo do alerta */
+.alert {
+    background-color: #4CAF50; /* Cor verde para sucesso */
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    position: fixed;
+    top: 20px; /* Distância do topo da tela */
+    left: 50%; /* Posiciona no meio da tela */
+    transform: translateX(-50%); /* Ajusta para centralizar completamente */
+    z-index: 1000;
+    display: none; /* Inicialmente escondido */
+    width: 300px;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Estilo do botão de fechar */
+.alert-closebtn {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
 }

@@ -29,40 +29,41 @@
         <section class="card">
             <h2>Vendas</h2>
             <p>Relatório de vendas.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Relatório</button></a>
+            <a href="relatorio_vendas.php"><button>Exibir Relatório</button></a>
         </section>
 
          <!-- Relatório de Compras-->
          <section class="card">
             <h2>Compras</h2>
             <p>Relatório de compras.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Relatório</button></a>
+            <a href="relatorio_compras.php"><button>Exibir Relatório</button></a>
         </section>
 
          <!-- Relatório de Estoque-->
          <section class="card">
             <h2>Estoque</h2>
             <p>Relatório de estoque.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Relatório</button></a>
+            <a href="relatorio_estoque.php"><button>Exibir Relatório</button></a>
         </section>
 
          <!-- Relatório de Frequencia de Clientes-->
          <section class="card">
             <h2>Frequencia de  Clientes</h2>
             <p>Relatório de frequencia de clientes.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Relatório</button></a>
+            <a href="relatorio_frequencia_clientes.php"><button>Exibir Relatório</button></a>
         </section>
 
          <!-- Relatório de Produtos-->
          <section class="card">
-            <h2>Venda de Funcionário</h2>
+            <h2>Vendas por Funcionário</h2>
             <p>Relatório de vendas de funcionario.</p>
-            <a href="cadastros/cadastro_produtos.php"><button>Exibir Relatório</button></a>
+            <a href="relatorio_vendas_funcionario.php"><button>Exibir Relatório</button></a>
         </section>
     </main>
 
-    <footer>
-        <p>© 2024 Seu Sistema. Todos os direitos reservados.</p>
+   <!-- Rodapé -->
+   <footer>
+        <p>&copy; 2024 CommerceHub - Todos os direitos reservados.</p>
     </footer>
 </body>
 </html>
