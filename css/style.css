@@ -701,3 +701,72 @@ footer {
     right: 10px;
     cursor: pointer;
 }
+/*------------------------------------------------*/
+
+.modal-acesso {
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-acesso__content {
+  background-color: #3a3a3a;
+  color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  text-align: center;
+}
+
+.modal-acesso__content h2 {
+  color: #ffcc00;
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.modal-acesso__content p {
+  font-size: 16px;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.modal-acesso__close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffcc00;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.modal-acesso__close-btn:hover {
+  color: #e0b800;
+}
+
+.modal-acesso__button {
+  padding: 10px 25px;
+  background-color: #ffcc00;
+  color: #333;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modal-acesso__button:hover {
+  background-color: #e0b800;
+  transform: translateY(-2px);
+}

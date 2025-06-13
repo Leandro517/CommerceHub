@@ -108,8 +108,11 @@ CREATE TABLE usuarios (
   email VARCHAR(100) NOT NULL UNIQUE,
   senha_hash VARCHAR(255) NOT NULL,
   tipo ENUM('admin', 'funcionario') NOT NULL DEFAULT 'funcionario',
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ID_Funcionario INT NULL,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_usuario_funcionario FOREIGN KEY (ID_Funcionario) REFERENCES funcionario(ID_Funcionario)
 );
+
 INSERT INTO usuarios (nome, email, senha_hash, tipo) VALUES (
   'Administrador',
   'admin@commercehub.com',
