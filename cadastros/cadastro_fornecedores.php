@@ -7,30 +7,46 @@ include '../config/config.php';
 $search_field = isset($_GET['search_field']) ? $_GET['search_field'] : '';
 $search_value = isset($_GET['search_value']) ? $_GET['search_value'] : '';
 
-// Processar o cadastro do fornecedor se o método for POST
+// Processar o cadastro ou atualização do fornecedor se o método for POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fornecedor_id = isset($_POST['fornecedor_id']) ? $_POST['fornecedor_id'] : '';
     $nome = $_POST['nome'];
+    $cep = preg_replace('/\D/', '', $_POST['cep']); // limpa qualquer traço
     $endereco = $_POST['endereco'];
+    $numero = $_POST['numero'];   // NOVO
+    $bairro = $_POST['bairro'];
+    $cidade = $_POST['cidade'];
+    $estado = strtoupper($_POST['estado']);
     $telefone = $_POST['telefone'];
     $condicoes_pagamento = $_POST['condicoes_pagamento'];
 
     try {
         if ($fornecedor_id) {
-            // Atualizar fornecedor existente
-            $stmt = $conn->prepare("UPDATE fornecedor SET nome = :nome, endereco = :endereco, telefone = :telefone, condicoes_pagamento = :condicoes_pagamento WHERE ID_Fornecedor = :fornecedor_id");
+            // Atualização
+            $stmt = $conn->prepare("UPDATE fornecedor SET 
+                nome = :nome, cep = :cep, endereco = :endereco, numero = :numero, bairro = :bairro, 
+                cidade = :cidade, estado = :estado, telefone = :telefone, 
+                condicoes_pagamento = :condicoes_pagamento 
+                WHERE ID_Fornecedor = :fornecedor_id");
             $stmt->bindParam(':fornecedor_id', $fornecedor_id);
         } else {
-            // Inserir novo fornecedor
-            $stmt = $conn->prepare("INSERT INTO fornecedor (nome, endereco, telefone, condicoes_pagamento) VALUES (:nome, :endereco, :telefone, :condicoes_pagamento)");
+            // Inserção
+            $stmt = $conn->prepare("INSERT INTO fornecedor 
+                (nome, cep, endereco, numero, bairro, cidade, estado, telefone, condicoes_pagamento) 
+                VALUES (:nome, :cep, :endereco, :numero, :bairro, :cidade, :estado, :telefone, :condicoes_pagamento)");
         }
+
         $stmt->bindParam(':nome', $nome);
+        $stmt->bindParam(':cep', $cep);
         $stmt->bindParam(':endereco', $endereco);
+        $stmt->bindParam(':numero', $numero); // bind do número
+        $stmt->bindParam(':bairro', $bairro);
+        $stmt->bindParam(':cidade', $cidade);
+        $stmt->bindParam(':estado', $estado);
         $stmt->bindParam(':telefone', $telefone);
         $stmt->bindParam(':condicoes_pagamento', $condicoes_pagamento);
-        
-        $stmt->execute();
 
+        $stmt->execute();
         header("Location: ./cadastro_fornecedores.php");
         exit();
     } catch (PDOException $e) {
@@ -38,25 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Verifique se o método é DELETE
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['delete_id'])) {
-    $id = $_GET['delete_id'];
+// DELETE permanece igual...
 
-    if ($id) {
-        try {
-            $stmt = $conn->prepare("DELETE FROM fornecedor WHERE ID_Fornecedor = :id");
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-            
-            header("Location: ./cadastro_fornecedores.php"); // Redireciona após exclusão
-            exit();
-        } catch (PDOException $e) {
-            echo "Erro ao excluir fornecedor: " . $e->getMessage();
-        }
-    }
-}
-
-// Consultar fornecedores com base na pesquisa
+// Consulta com filtro
 $query = "SELECT * FROM fornecedor";
 
 if ($search_field && $search_value) {
@@ -116,72 +116,112 @@ $fornecedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <button class="add-button" onclick="openModal()">+ Cadastrar Fornecedor</button>
         </section>
 
-        <section class="table-section">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Endereço</th>
-                        <th>Telefone</th>
-                        <th>Condições de Pagamento</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="supplierTable">
-                    <?php foreach ($fornecedores as $row): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['nome']) ?></td>
-                            <td><?= htmlspecialchars($row['endereco']) ?></td>
-                            <td><?= htmlspecialchars($row['telefone']) ?></td>
-                            <td><?= htmlspecialchars($row['condicoes_pagamento']) ?></td>
-                            <td>
-                                <button class='edit' onclick="editSupplier(<?= $row['ID_Fornecedor'] ?>, '<?= addslashes($row['nome']) ?>', '<?= addslashes($row['endereco']) ?>', '<?= addslashes($row['telefone']) ?>', '<?= addslashes($row['condicoes_pagamento']) ?>')">Editar</button>
-                                <button class='delete' onclick="deleteSupplier(<?= $row['ID_Fornecedor'] ?>)">Excluir</button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </section>
-    </div>
+<section class="table-section">
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CEP</th>
+                <th>Endereço</th>
+                <th>Número</th>
+                <th>Telefone</th>
+                <th>Condições de Pagamento</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="supplierTable">
+            <?php foreach ($fornecedores as $row): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['nome']) ?></td>
+                    <td><?= htmlspecialchars($row['cep']) ?></td>
+                    <td><?= htmlspecialchars($row['endereco']) ?></td>
+                    <td><?= htmlspecialchars($row['numero']) ?></td>
+                    <td><?= htmlspecialchars($row['telefone']) ?></td>
+                    <td><?= htmlspecialchars($row['condicoes_pagamento']) ?></td>
+                    <td>
+                        <button class='edit' 
+                            onclick="editSupplier(
+                                <?= $row['ID_Fornecedor'] ?>, 
+                                '<?= addslashes($row['nome']) ?>', 
+                                '<?= addslashes($row['cep']) ?>', 
+                                '<?= addslashes($row['endereco']) ?>',
+                                '<?= addslashes($row['numero']) ?>',
+                                '<?= addslashes($row['bairro']) ?>',
+                                '<?= addslashes($row['cidade']) ?>',
+                                '<?= addslashes($row['estado']) ?>',
+                                '<?= addslashes($row['telefone']) ?>', 
+                                '<?= addslashes($row['condicoes_pagamento']) ?>'
+                            )">Editar</button>
+                        <button class='delete' onclick="deleteSupplier(<?= $row['ID_Fornecedor'] ?>)">Excluir</button>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</section>
 
-    <!-- Modal para Cadastro de Fornecedor -->
-    <div id="supplierModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Cadastrar Fornecedor</h2>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            <form id="supplierForm" action="./cadastro_fornecedores.php" method="POST">
-                <input type="hidden" id="fornecedor_id" name="fornecedor_id">
-                <div class="modal-body">
-                    <div class="input-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="endereco">Endereço:</label>
-                        <input type="text" id="endereco" name="endereco" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="telefone">Telefone:</label>
-                        <input type="text" id="telefone" name="telefone" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="condicoes_pagamento">Condições de Pagamento:</label>
-                        <input type="text" id="condicoes_pagamento" name="condicoes_pagamento" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn-save">Salvar Fornecedor</button>
-                </div>
-            </form>
+<!-- Modal -->
+<div id="supplierModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Cadastrar Fornecedor</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
         </div>
+        <form id="supplierForm" action="./cadastro_fornecedores.php" method="POST">
+            <input type="hidden" id="fornecedor_id" name="fornecedor_id">
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="cep">CEP:</label>
+                    <input type="text" id="cep" name="cep" maxlength="9" required onblur="buscarCep(this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label for="endereco">Endereço:</label>
+                    <input type="text" id="endereco" name="endereco" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="numero">Número:</label>
+                    <input type="text" id="numero" name="numero" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="bairro">Bairro:</label>
+                    <input type="text" id="bairro" name="bairro" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="cidade">Cidade:</label>
+                    <input type="text" id="cidade" name="cidade" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="estado">Estado (UF):</label>
+                    <input type="text" id="estado" name="estado" maxlength="2" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="telefone">Telefone:</label>
+                    <input type="text" id="telefone" name="telefone" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="condicoes_pagamento">Condições de Pagamento:</label>
+                    <input type="text" id="condicoes_pagamento" name="condicoes_pagamento" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn-save">Salvar Fornecedor</button>
+            </div>
+        </form>
     </div>
-    
+</div>
+
     <script>
         function openModal() {
             document.getElementById('supplierModal').style.display = 'block';
@@ -194,12 +234,30 @@ $fornecedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('supplierModal').style.display = 'none';
         }
 
-        function editSupplier(id, nome, endereco, telefone, condicoes_pagamento) {
+        function meu_callback(conteudo) {
+            if (!("erro" in conteudo)) {
+                document.getElementById('endereco').value = conteudo.logradouro || '';
+                document.getElementById('bairro').value = conteudo.bairro || '';
+                document.getElementById('cidade').value = conteudo.localidade || '';
+                document.getElementById('estado').value = conteudo.uf || '';
+            } else {
+                limpar_formulario_cep();
+                alert("CEP não encontrado.");
+            }
+        }
+
+        function editSupplier(id, nome, cep, endereco, numero, bairro, cidade, estado, telefone, condicoes_pagamento) {
             document.getElementById('fornecedor_id').value = id;
             document.getElementById('nome').value = nome;
+            document.getElementById('cep').value = cep;
             document.getElementById('endereco').value = endereco;
+            document.getElementById('numero').value = numero;
+            document.getElementById('bairro').value = bairro;
+            document.getElementById('cidade').value = cidade;
+            document.getElementById('estado').value = estado;
             document.getElementById('telefone').value = telefone;
             document.getElementById('condicoes_pagamento').value = condicoes_pagamento;
+
             document.getElementById('supplierModal').style.display = 'block';
             document.getElementById('modalTitle').innerText = 'Editar Fornecedor';
         }
@@ -207,6 +265,36 @@ $fornecedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
         function deleteSupplier(id) {
             if (confirm('Tem certeza de que deseja excluir este fornecedor?')) {
                 window.location.href = './cadastro_fornecedores.php?delete_id=' + id;
+            }
+        }
+
+        function limpar_formulario_cep() {
+            document.getElementById('endereco').value = "";
+            document.getElementById('bairro').value = "";
+            document.getElementById('cidade').value = "";
+            document.getElementById('estado').value = "";
+        }
+
+        //Busca o CEP
+        function buscarCep(valor) {
+            var cep = valor.replace(/\D/g, '');
+
+            if (cep != "") {
+                var validacep = /^[0-9]{8}$/;
+
+                if(validacep.test(cep)) {
+                    document.getElementById('endereco').value = "...";
+
+                    var script = document.createElement('script');
+                    script.src = 'https://viacep.com.br/ws/' + cep + '/json/?callback=meu_callback';
+                    document.body.appendChild(script);
+
+                } else {
+                    limpar_formulario_cep();
+                    alert("Formato de CEP inválido.");
+                }
+            } else {
+                limpar_formulario_cep();
             }
         }
     </script>

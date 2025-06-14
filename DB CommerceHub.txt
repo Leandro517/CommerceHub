@@ -14,15 +14,25 @@ CREATE TABLE cliente (
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NULL,
     telefone VARCHAR(20) NULL,
-    endereco VARCHAR(255) NULL
+    cep VARCHAR(9) NULL,
+    rua VARCHAR(255) NULL,
+    numero VARCHAR(10) NULL,
+    bairro VARCHAR(255) NULL,
+    cidade VARCHAR(255) NULL,
+    estado VARCHAR(2) NULL
 );
 
 -- Tabela fornecedor
 CREATE TABLE fornecedor (
     ID_Fornecedor INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    telefone VARCHAR(20) NULL,
+    cep CHAR(8) NOT NULL,
     endereco VARCHAR(255) NULL,
+    numero VARCHAR(10) NULL,
+    bairro VARCHAR(100) NULL,
+    cidade VARCHAR(100) NULL,
+    estado CHAR(2) NULL,
+    telefone VARCHAR(20) NULL,
     condicoes_pagamento VARCHAR(255) NULL
 );
 
