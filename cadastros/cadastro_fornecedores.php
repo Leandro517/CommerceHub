@@ -297,6 +297,22 @@ $fornecedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 limpar_formulario_cep();
             }
         }
+
+        //Formata o telefone em tempo real
+        document.getElementById('telefone').addEventListener('input', function (e) {
+        let input = e.target;
+        let value = input.value.replace(/\D/g, ''); // Remove tudo que não é número
+
+        if (value.length > 11) value = value.slice(0, 11); // Limita a 11 dígitos
+
+        if (value.length <= 10) {
+            value = value.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+        } else {
+            value = value.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+        }
+
+        input.value = value;
+    });
     </script>
     
    <!-- Rodapé -->

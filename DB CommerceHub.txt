@@ -110,8 +110,7 @@ CREATE TABLE estoque (
     FOREIGN KEY (ID_Produto) REFERENCES produtos(ID_Produto)
 );
 
---------Adicionado---------
-
+-- Tabela usuarios
 CREATE TABLE usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nome VARCHAR(100) NOT NULL,
@@ -123,9 +122,19 @@ CREATE TABLE usuarios (
   CONSTRAINT fk_usuario_funcionario FOREIGN KEY (ID_Funcionario) REFERENCES funcionario(ID_Funcionario)
 );
 
+-- Cria o usuário Admin
 INSERT INTO usuarios (nome, email, senha_hash, tipo) VALUES (
   'Administrador',
   'admin@commercehub.com',
   '$2y$10$yEUPUoYHmgK6/OEc8.qoLuElkCjUvAKvFkQfqFTyoq5VR.95BSyz2',
   'admin'
+);
+
+-- Tabela Logs
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT,
+    acao VARCHAR(255),
+    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
+    detalhes TEXT
 );

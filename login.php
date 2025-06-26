@@ -1,8 +1,10 @@
 <?php
 session_start();
 
-require_once 'config/config.php'; // conexão PDO com $conn
-require_once 'vendor/autoload.php'; // JWT
+require_once 'config/config.php';
+require_once 'vendor/autoload.php';
+require_once 'utils/log.php';
+
 
 use Firebase\JWT\JWT;
 
@@ -35,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 "iss" => "commercehub",
                 "aud" => "commercehub_usuarios",
                 "iat" => time(),
-                "exp" => time() + 3600, // token válido por 1 hora
+                "exp" => time() + 600, // token válido por 10 minuto
                 "data" => [
                     "id" => $usuario['id'],
                     "nome" => $usuario['nome'],
@@ -44,11 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ]
             ];
 
-            $chave_secreta = 'leandro_commercehub2024_seguro';
+            $chave_secreta = 'sua_chave_secreta';
             $token = JWT::encode($payload, $chave_secreta, 'HS256');
 
             //Caso seja necessário mostrar o TOKEN
-            //echo '<pre>Token gerado: ' . $token . '</pre>';
+            // echo '<pre>Token gerado: ' . $token . '</pre>';
             //exit;
 
             // Armazena dados na sessão
@@ -59,6 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Armazena o token JWT na sessão
             $_SESSION['token'] = $token;
+
+            // Registra o log de login
+            registrarLog($conn, $usuario['id'], 'Login', 'Usuário logado com sucesso');
 
             // Redireciona para o dashboard
             header("Location: index.php");

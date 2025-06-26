@@ -82,7 +82,24 @@ session_start();
         <p>&copy; 2024 CommerceHub - Todos os direitos reservados.</p>
     </footer>
 
-    <script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const userTipo = "<?php echo $_SESSION['user_tipo']; ?>";
+        const btn = document.getElementById('btnCadastrarFuncionario');
+
+        if (btn) {
+            btn.addEventListener('click', function () {
+                const tiposPermitidos = ['admin'];
+                if (tiposPermitidos.includes(userTipo)) {
+                    window.location.href = 'cadastro_funcionarios.php';
+                } else {
+                    openAcessoNegadoModal();
+                }
+            });
+        } else {
+            console.warn("Botão não encontrado.");
+        }
+
         function openAcessoNegadoModal() {
             document.getElementById('modalAcessoNegado').style.display = 'flex';
         }
@@ -91,14 +108,13 @@ session_start();
             document.getElementById('modalAcessoNegado').style.display = 'none';
         }
 
-        document.getElementById('btnCadastrarFuncionario').addEventListener('click', function () {
-            const tiposPermitidos = ['admin']; // Altere os tipos permitidos conforme necessário
-            if (tiposPermitidos.includes(userTipo)) {
-                window.location.href = 'cadastro_funcionarios.php';
-            } else {
-                openAcessoNegadoModal();
-            }
-        });
-    </script>
+        // Garante que o botão de fechar modal funcione
+        const closeBtn = document.querySelector('.modal-acesso__close-btn');
+        const closeBtn2 = document.querySelector('.modal-acesso__button');
+        if (closeBtn) closeBtn.addEventListener('click', closeAcessoNegadoModal);
+        if (closeBtn2) closeBtn2.addEventListener('click', closeAcessoNegadoModal);
+    });
+</script>
+
 </body>
 </html>

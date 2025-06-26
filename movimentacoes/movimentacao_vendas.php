@@ -3,106 +3,108 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include '../config/config.php';
 
+// Função para registrar logs
+function registrarLog($conn, $usuario_id, $acao, $detalhes = null) {
+    $stmt = $conn->prepare("INSERT INTO logs (usuario_id, acao, detalhes) VALUES (?, ?, ?)");
+    $stmt->execute([$usuario_id, $acao, $detalhes]);
+}
+
+// Capturar usuário logado (exemplo, adapte conforme seu sistema)
+session_start();
+$usuario_id = $_SESSION['usuario_id'] ?? null; // ou ajuste conforme seu sistema
+
+// Buscar clientes e funcionários para o formulário (se necessário)
 $clientes = $conn->query("SELECT ID_Cliente, nome FROM cliente ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
 $funcionarios = $conn->query("SELECT ID_Funcionario, nome FROM funcionario ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-$query = "SELECT v.ID_Venda, c.nome AS cliente, func.nome AS funcionario, p.nome AS produto, vp.quantidade, vp.preco, v.data_venda, 
-                 (vp.quantidade * vp.preco) AS valor_total
+// Buscar vendas para exibir (exemplo simplificado)
+$query = "SELECT v.ID_Venda, c.nome AS cliente, f.nome AS funcionario, p.nome AS produto, vp.quantidade, vp.preco, v.data_venda,
+          (vp.quantidade * vp.preco) AS valor_total
           FROM venda v
           JOIN venda_produto vp ON v.ID_Venda = vp.ID_Venda
           JOIN produtos p ON vp.ID_Produto = p.ID_Produto
           LEFT JOIN cliente c ON v.ID_Cliente = c.ID_Cliente
-          LEFT JOIN funcionario func ON v.ID_Funcionario = func.ID_Funcionario
+          LEFT JOIN funcionario f ON v.ID_Funcionario = f.ID_Funcionario
           ORDER BY v.ID_Venda ASC";
-
 $stmt = $conn->prepare($query);
 $stmt->execute();
 $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['delete_id'])) {
-        $delete_id = $_POST['delete_id'];
-        $conn->beginTransaction();
-        try {
-            $stmt = $conn->prepare("DELETE FROM venda_produto WHERE ID_Venda = :id");
-            $stmt->execute(['id' => $delete_id]);
-
-            $stmt = $conn->prepare("DELETE FROM venda WHERE ID_Venda = :id");
-            $stmt->execute(['id' => $delete_id]);
-
-            $conn->commit();
-            echo json_encode(['message' => 'Venda excluída com sucesso!']);
-            exit;
-        } catch (Exception $e) {
-            $conn->rollBack();
-            echo json_encode(['message' => 'Erro ao excluir venda: ' . $e->getMessage()]);
-            exit;
-        }
-    }
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Dados do formulário
     $venda_id = $_POST['venda_id'] ?? null;
-    $cliente_id = $_POST['cliente_id'];
-    $funcionario_id = $_POST['funcionario_id'];
-    $produto_id = $_POST['produto_id'];
-    $quantidade = $_POST['quantidade'];
-    $preco = $_POST['preco'];
-    $data_venda = $_POST['data_venda'];
+    $cliente_id = $_POST['cliente_id'] ?? null;
+    $funcionario_id = $_POST['funcionario_id'] ?? null;
+    $produto_id = $_POST['produto_id'] ?? null;
+    $quantidade = isset($_POST['quantidade']) ? (int) $_POST['quantidade'] : 0;
+    $preco = isset($_POST['preco']) ? (float) $_POST['preco'] : 0;
+    $data_venda = $_POST['data_venda'] ?? date('Y-m-d');
 
     try {
         $conn->beginTransaction();
 
-        // VERIFICA ESTOQUE DISPONÍVEL
-        $stmt = $conn->prepare("SELECT quantidade FROM produtos WHERE ID_Produto = :produto_id");
-        $stmt->execute(['produto_id' => $produto_id]);
-        $estoque = $stmt->fetchColumn();
+        // 1. Verificar estoque atual pelo campo produtos.quantidade
+        $stmtEstoque = $conn->prepare("SELECT quantidade FROM produtos WHERE ID_Produto = :produto_id FOR UPDATE");
+        $stmtEstoque->execute(['produto_id' => $produto_id]);
+        $estoqueAtual = (int) $stmtEstoque->fetchColumn();
 
-        if ($estoque === false || $quantidade > $estoque) {
-            throw new Exception("Estoque insuficiente para o produto selecionado.");
+        if ($estoqueAtual < $quantidade) {
+            throw new Exception("Estoque insuficiente para o produto selecionado. Estoque atual: $estoqueAtual");
         }
 
         if (empty($venda_id)) {
+            // Inserir venda
             $stmt = $conn->prepare("INSERT INTO venda (ID_Cliente, ID_Funcionario, data_venda) VALUES (:cliente_id, :funcionario_id, :data_venda)");
             $stmt->execute([
                 'cliente_id' => $cliente_id,
                 'funcionario_id' => $funcionario_id,
                 'data_venda' => $data_venda
             ]);
-            $last_id = $conn->lastInsertId();
+            $venda_id = $conn->lastInsertId();
 
+            // Inserir produto da venda
             $stmt = $conn->prepare("INSERT INTO venda_produto (ID_Venda, ID_Produto, quantidade, preco) VALUES (:venda_id, :produto_id, :quantidade, :preco)");
             $stmt->execute([
-                'venda_id' => $last_id,
+                'venda_id' => $venda_id,
                 'produto_id' => $produto_id,
                 'quantidade' => $quantidade,
                 'preco' => $preco
             ]);
 
+            // Registrar saída no estoque
             $stmt = $conn->prepare("INSERT INTO estoque (ID_Produto, tipo_movimento, quantidade) VALUES (:produto_id, 'saida', :quantidade)");
             $stmt->execute([
                 'produto_id' => $produto_id,
                 'quantidade' => $quantidade
             ]);
 
+            // Atualizar quantidade em produtos
             $stmt = $conn->prepare("UPDATE produtos SET quantidade = quantidade - :quantidade WHERE ID_Produto = :produto_id");
             $stmt->execute([
                 'quantidade' => $quantidade,
                 'produto_id' => $produto_id
             ]);
+
+            // Registrar log
+            registrarLog($conn, $usuario_id, "Nova venda registrada", "Venda ID: $venda_id, Produto ID: $produto_id, Quantidade: $quantidade");
+
         } else {
-            $stmt_produto_antigo = $conn->prepare("SELECT quantidade FROM venda_produto WHERE ID_Venda = :venda_id AND ID_Produto = :produto_id");
-            $stmt_produto_antigo->execute([
+            // Atualizar venda existente
+            // Pegar quantidade antiga para ajustar estoque
+            $stmtAntiga = $conn->prepare("SELECT quantidade FROM venda_produto WHERE ID_Venda = :venda_id AND ID_Produto = :produto_id");
+            $stmtAntiga->execute([
                 'venda_id' => $venda_id,
                 'produto_id' => $produto_id
             ]);
-            $quantidade_antiga = $stmt_produto_antigo->fetchColumn() ?? 0;
+            $quantidadeAntiga = (int) $stmtAntiga->fetchColumn();
 
-            $diferenca_quantidade = $quantidade - $quantidade_antiga;
+            $diferenca = $quantidade - $quantidadeAntiga;
 
-            // Verifica se há estoque suficiente para a diferença
-            if ($diferenca_quantidade > 0 && $diferenca_quantidade > $estoque) {
-                throw new Exception("Estoque insuficiente para atualizar a venda.");
+            if ($diferenca > 0 && $estoqueAtual < $diferenca) {
+                throw new Exception("Estoque insuficiente para aumentar a quantidade da venda. Estoque atual: $estoqueAtual");
             }
 
+            // Atualizar venda
             $stmt = $conn->prepare("UPDATE venda SET ID_Cliente = :cliente_id, ID_Funcionario = :funcionario_id, data_venda = :data_venda WHERE ID_Venda = :venda_id");
             $stmt->execute([
                 'cliente_id' => $cliente_id,
@@ -111,27 +113,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'venda_id' => $venda_id
             ]);
 
-            $stmt = $conn->prepare("UPDATE venda_produto SET ID_Produto = :produto_id, quantidade = :quantidade WHERE ID_Venda = :venda_id");
+            // Atualizar venda_produto
+            $stmt = $conn->prepare("UPDATE venda_produto SET quantidade = :quantidade, preco = :preco WHERE ID_Venda = :venda_id AND ID_Produto = :produto_id");
             $stmt->execute([
-                'produto_id' => $produto_id,
                 'quantidade' => $quantidade,
-                'venda_id' => $venda_id
-            ]);
-
-            $stmt = $conn->prepare("INSERT INTO estoque (ID_Produto, tipo_movimento, quantidade) VALUES (:produto_id, 'saida', :quantidade)");
-            $stmt->execute([
-                'produto_id' => $produto_id,
-                'quantidade' => $diferenca_quantidade
-            ]);
-
-            $stmt = $conn->prepare("UPDATE produtos SET quantidade = quantidade - :quantidade WHERE ID_Produto = :produto_id");
-            $stmt->execute([
-                'quantidade' => $diferenca_quantidade,
+                'preco' => $preco,
+                'venda_id' => $venda_id,
                 'produto_id' => $produto_id
             ]);
+
+            // Registrar movimento no estoque (apenas diferença)
+            if ($diferenca != 0) {
+                $tipoMovimento = $diferenca > 0 ? 'saida' : 'entrada';
+                $stmt = $conn->prepare("INSERT INTO estoque (ID_Produto, tipo_movimento, quantidade) VALUES (:produto_id, :tipo, :quantidade)");
+                $stmt->execute([
+                    'produto_id' => $produto_id,
+                    'tipo' => $tipoMovimento,
+                    'quantidade' => abs($diferenca)
+                ]);
+
+                // Atualizar quantidade em produtos
+                $stmt = $conn->prepare("UPDATE produtos SET quantidade = quantidade - :diferenca WHERE ID_Produto = :produto_id");
+                // Atenção: para 'entrada', diferenca é negativa, então subtrair diferenca negativa = somar
+                $stmt->execute([
+                    'diferenca' => $diferenca,
+                    'produto_id' => $produto_id
+                ]);
+            }
+
+            // Registrar log
+            registrarLog($conn, $usuario_id, "Venda atualizada", "Venda ID: $venda_id, Produto ID: $produto_id, Quantidade antiga: $quantidadeAntiga, nova: $quantidade");
         }
 
         $conn->commit();
+
+        // Redirecionar para evitar reenvio
         header("Location: {$_SERVER['PHP_SELF']}");
         exit;
 
@@ -142,9 +158,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+// Opcional: editar venda via GET para preencher formulário (AJAX)
 if (isset($_GET['edit_id'])) {
-    $edit_id = $_GET['edit_id'];
-    $query = "SELECT v.ID_Venda, v.ID_Cliente, v.ID_Funcionario, vp.ID_Produto, vp.quantidade, v.data_venda
+    $edit_id = (int) $_GET['edit_id'];
+    $query = "SELECT v.ID_Venda, v.ID_Cliente, v.ID_Funcionario, vp.ID_Produto, vp.quantidade, vp.preco, v.data_venda
               FROM venda v
               JOIN venda_produto vp ON v.ID_Venda = vp.ID_Venda
               WHERE v.ID_Venda = :id";
@@ -155,7 +172,6 @@ if (isset($_GET['edit_id'])) {
     exit;
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -211,8 +227,8 @@ if (isset($_GET['edit_id'])) {
                             <td><?= isset($row['funcionario']) ? htmlspecialchars($row['funcionario']) : '' ?></td>
                             <td><?= isset($row['quantidade']) ? htmlspecialchars($row['quantidade']) : '' ?></td>
                             <td><?= isset($row['preco']) && $row['preco'] > 0 ? number_format($row['preco'], 2, ',', '.') : 'R$ 0,00' ?></td>
-                            <td><?= isset($row['valor_total']) && $row['valor_total'] > 0 ? 'R$ ' . number_format($row['valor_total'], 2, ',', '.') : 'R$ 0,00' ?></td>
                             <td><?= isset($row['data_venda']) ? htmlspecialchars($row['data_venda']) : '' ?></td>
+                            <td><?= isset($row['valor_total']) && $row['valor_total'] > 0 ? 'R$ ' . number_format($row['valor_total'], 2, ',', '.') : 'R$ 0,00' ?></td>
                             <td>
                                 <button class="edit" onclick="editSale(<?= $row['ID_Venda'] ?>)">Editar</button>
                                 <button class="delete" onclick="deleteSale(<?= $row['ID_Venda'] ?>)">Excluir</button>

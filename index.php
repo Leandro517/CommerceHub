@@ -13,7 +13,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 $token = $_SESSION['token'] ?? null;
-$chave_secreta = 'leandro_commercehub2024_seguro';
+$chave_secreta = 'sua_chave_secreta';
 
 if (!$token) {
     // Sem token, força logout

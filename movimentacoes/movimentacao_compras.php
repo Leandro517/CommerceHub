@@ -3,6 +3,24 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include '../config/config.php';
 
+// Função para registrar log
+function registrarLog($conn, $usuario_id, $acao, $detalhes = null) {
+    $stmt = $conn->prepare("INSERT INTO logs (usuario_id, acao, detalhes, data_hora) VALUES (:usuario_id, :acao, :detalhes, NOW())");
+    $stmt->execute([
+        'usuario_id' => $usuario_id,
+        'acao' => $acao,
+        'detalhes' => $detalhes
+    ]);
+}
+
+// Exemplo: obtendo usuário logado, ajustar conforme sua implementação de autenticação
+session_start();
+$usuario_id = $_SESSION['user_id'] ?? null;
+
+if (!$usuario_id) {
+    die("Usuário não autenticado. Faça login para continuar.");
+}
+
 // Consultar a lista de fornecedores e funcionários para incluir no formulário
 $fornecedores = $conn->query("SELECT ID_Fornecedor, nome FROM fornecedor ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
 $funcionarios = $conn->query("SELECT ID_Funcionario, nome FROM funcionario ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -36,6 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Deletar registro da tabela compra
             $stmt = $conn->prepare("DELETE FROM compra WHERE ID_Compra = :id");
             $stmt->execute(['id' => $delete_id]);
+
+            // Registrar log da exclusão
+            registrarLog($conn, $usuario_id, 'exclusao_compra', "Compra ID $delete_id excluída");
 
             $conn->commit();
             echo json_encode(['message' => 'Compra excluída com sucesso!']);
@@ -84,11 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ]);
 
             // Atualizar a quantidade do produto na tabela produtos
-            $stmt = $conn->prepare("UPDATE produtos SET quantidade = quantidade - :quantidade WHERE ID_Produto = :produto_id");
+            $stmt = $conn->prepare("UPDATE produtos SET quantidade = quantidade + :quantidade WHERE ID_Produto = :produto_id");
             $stmt->execute([
                 'quantidade' => $quantidade,
                 'produto_id' => $produto_id
             ]);
+
+            // Registrar log da inserção
+            registrarLog($conn, $usuario_id, 'insercao_compra', "Compra ID $last_id inserida com Produto ID $produto_id, quantidade $quantidade, preço $preco");
 
         } else {
             // Edição de compra
@@ -123,15 +147,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Calcular a diferença na quantidade
                 $diferenca_quantidade = $quantidade - $quantidade_antiga;
 
-                // Atualizar o estoque após edição (aumentar ou diminuir a quantidade)
-                $stmt_estoque = $conn->prepare("UPDATE estoque
+                // Atualizar estoque na tabela produtos
+                $stmt_estoque = $conn->prepare("UPDATE produtos
                     SET quantidade = quantidade + :diferenca_quantidade
                     WHERE ID_Produto = :produto_id
                 ");
                 $stmt_estoque->execute([
-                    'produto_id' => $produto_id,
-                    'diferenca_quantidade' => $diferenca_quantidade
+                    'diferenca_quantidade' => $diferenca_quantidade,
+                    'produto_id' => $produto_id
                 ]);
+
+                // Registrar log da edição
+                registrarLog($conn, $usuario_id, 'edicao_compra', "Compra ID $compra_id editada: Produto ID $produto_id, quantidade $quantidade, preço $preco, diferença na quantidade $diferenca_quantidade");
             }
         }
 

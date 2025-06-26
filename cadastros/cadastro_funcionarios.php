@@ -6,11 +6,6 @@ include '../config/config.php';
 require_once '../auth/auth.php';
 verificarAcesso(['admin']);
 
-if ($decoded->tipo !== 'admin') {
-    header("Location: acesso_negado.php");
-    exit;
-}
-
 // Inicializando as variáveis para evitar avisos
 $search_field = isset($_GET['search_field']) ? $_GET['search_field'] : 'nome';
 $search_value = isset($_GET['search_value']) ? $_GET['search_value'] : '';
